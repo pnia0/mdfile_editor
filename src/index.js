@@ -15,6 +15,10 @@ class Editor {
         this.#view.arrowDown(this.#buffer.outputCursor());
         this.#view.updateCursor(this.#buffer.arrowDown());
     }
+    arrowUp(){
+        this.#view.arrowUp(this.#buffer.outputCursor());
+        this.#view.updateCursor(this.#buffer.arrowUp());
+    }
     
 }
 
@@ -44,6 +48,15 @@ class Buffer {
             count++;
         }
     }
+    picLastLine(text){
+        let count = text.length;
+        while(1) {
+            if (text.substring(count - 1, count) == "\n") {
+                return count;
+            }
+            count--;
+        }
+    }
     clearHeadLine(){}
     clearBottomLine(){}
     arrowDown(){
@@ -51,6 +64,13 @@ class Buffer {
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
         this.#cursor = this.#bottomBuffer.substring(0, firstLineBottom); 
         this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
+        return this.#cursor;
+    }
+    arrowUp(){
+        this.#bottomBuffer = this.#cursor + "\n" + this.#bottomBuffer;
+        let lastLineHead = this.picLastLine(this.#headBuffer);
+        this.#cursor = this.#headBuffer.substring(lastLineHead);
+        this.#headBuffer = this.#headBuffer.substring(0, lastLineHead - 1);
         return this.#cursor;
     }
 }
@@ -106,11 +126,19 @@ class View {
         let count = 0;
         while(1) {
             if (text.substring(count, count + 1) == "\n") {
-                break;
+                return count;
             }
             count++;
         }
-        return count
+    }
+    picLastLine(text){
+        let count = text.length;
+        while(1) {
+            if (text.substring(count - 1, count) == "\n") {
+                return count;
+            }
+            count--;
+        }
     }
     clearHeadLine(text){}
     clearBottomLine(text){}
@@ -119,6 +147,14 @@ class View {
         let firstLineBottom = this.picFirstLine(this.#bottomView.innerHTML);
         this.#bottomView.innerHTML = this.#bottomView.innerHTML.substring(firstLineBottom + 1);
         this.#cursorLineNumber++;
+        this.updateCursorLineNumber();
+        return;
+    }
+    arrowUp(line){
+        this.#bottomView.innerHTML = this.interpritBottom(line + "\n" + this.#bottomView.innerHTML);
+        let lastLineHead = this.picLastLine(this.#headView.innerHTML);
+        this.#headView.innerHTML = this.#headView.innerHTML.substring(0, lastLineHead - 1);
+        this.#cursorLineNumber--;
         this.updateCursorLineNumber();
         return;
     }
@@ -143,5 +179,8 @@ test.innerHTML = test_text.substring(0, 1);
 document.addEventListener("keydown", function(event){
     if (event.key === 'ArrowDown') {
         editor.arrowDown();
+    }
+    if (event.key === 'ArrowUp') {
+        editor.arrowUp();
     }
 })
