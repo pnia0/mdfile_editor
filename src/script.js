@@ -32,22 +32,22 @@ class Editor {
 
 class Buffer {
     #headBuffer = "";
-    #cursorLeft = "";
-    #cursorCenter = "";
-    #cursorRight = "";
+    #cursor;
     #bottomBuffer = "";
-    constructor(){}
+    constructor(){
+        this.#cursor = new cursorLine;
+    }
     init(text){
         let firstLineBottom = this.picFirstLine(text);
-        this.#cursorLeft = text.substring(0, firstLineBottom+1);
+        this.#cursor.init(text.substring(0, firstLineBottom+1), 0);
         this.#bottomBuffer = text.substring(firstLineBottom + 1);
-        return {headBuffer: this.#headBuffer, cursorLeft: this.#cursorLeft, cursorCenter: this.#cursorCenter, cursorRight: this.#cursorRight, bottomBuffer: this.#bottomBuffer};
+        return {headBuffer: this.#headBuffer, cursor: this.#cursor.outputCursor(), bottomBuffer: this.#bottomBuffer};
     }
     outputCursor(){
-        return this.#cursorLeft;
+        return this.#cursor.outputCursor();
     }
     outputText(){
-        return this.#headBuffer + this.#cursorLeft + this.#cursorCenter + this.#cursorRight + this.#bottomBuffer;
+        return this.#headBuffer + this.cursor.outputText() + this.#bottomBuffer;
     }
     picFirstLine(text){
         let length = text.length;
@@ -90,9 +90,9 @@ class Buffer {
         //        this.#headBuffer = "\n"
         //    }
         //}
-        this.#headBuffer += this.#cursorLeft + this.#cursorCenter + this.#cursorRight;
+        this.#headBuffer += this.#cursor.outputText();;
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
-        this.#cursorLeft = this.#bottomBuffer.substring(0, firstLineBottom+1);
+        this.#cursor.shift(this.#bottomBuffer.substring(0, firstLineBottom+1));
         if (firstLineBottom == this.#bottomBuffer.length){
             this.#bottomBuffer = "";
         } else {
@@ -108,12 +108,31 @@ class Buffer {
         //} else {
             
         //}
-        this.#bottomBuffer = this.#cursorLeft + this.#cursorCenter + this.#cursorRight + this.#bottomBuffer;
+        this.#bottomBuffer = this.#cursor.outputText + this.#bottomBuffer;
         let lastLineHead = this.picLastLine(this.#headBuffer);
-        this.#cursorLeft = this.#headBuffer.substring(lastLineHead);
+        this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
-        return {headBuffer: this.#headBuffer, cursorLeft: this.#cursorLeft, cursorCenter: this.#cursorCenter, cursorRight: this.#cursorRight, bottomBuffer: this.#bottomBuffer};
+        return {headBuffer: this.#headBuffer, cursor: this.#cursor.outputCursor(), bottomBuffer: this.#bottomBuffer};
+    }
+}
+
+class cursorLine {
+    #LeftBuffer = "";
+    #CenterBuffer = "";
+    #RightBuffer = "";
+    #offset = 0;
+    constructor(){}
+    init(line, offset){
+        length = line.length;
+        if(length <= offset) {
+            this.#offset = length;
+        } else {
+            this.#offset = offset;
+        }
+    }
+    outputCursor(){
+        return {leftBuffer: this.#LeftBuffer, centerBuffer: this.#CenterBuffer, rightBuffer: this.#RightBuffer};
     }
 }
 
