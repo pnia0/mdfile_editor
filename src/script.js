@@ -91,7 +91,7 @@ class Buffer {
         //        this.#headBuffer = "\n"
         //    }
         //}
-        this.#headBuffer += this.#cursor.outputText();;
+        this.#headBuffer += this.#cursor.outputText();
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
         this.#cursor.shift(this.#bottomBuffer.substring(0, firstLineBottom+1));
         if (firstLineBottom == this.#bottomBuffer.length){
@@ -110,7 +110,7 @@ class Buffer {
         //} else {
             
         //}
-        this.#bottomBuffer = this.#cursor.outputText + this.#bottomBuffer;
+        this.#bottomBuffer = this.#cursor.outputText() + this.#bottomBuffer;
         let lastLineHead = this.picLastLine(this.#headBuffer);
         this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
@@ -142,12 +142,15 @@ class cursorLine {
         if(length <= this.#offset) {
             this.#offset = length;
         }
+        this.#LeftBuffer = line.substring(0, this.#offset - 1);
+        this.#CenterBuffer = line.substring(this.#offset, this.#offset +1);
+        this.#RightBuffer = line.substring(this.#offset + 1);
     }
     outputView(){
         return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
     }
     outputText(){
-        return this.#LeftBuffer + this.#CenterBuffer + this.#RightBuffer;
+        return (this.#LeftBuffer + this.#CenterBuffer + this.#RightBuffer);
     }
 }
 
@@ -200,6 +203,7 @@ class View {
         this.#headView.style.border= "2px solid #ff0000";
         this.#cursorLineViewArea.style.border= "2px solid #ffff00";
         this.#bottomView.style.border= "2px solid #00ff00";
+        this.#cursorCenter.style.backgroundColor= "#888888";
         this.#cursorLineNumber = 1;
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
     }
