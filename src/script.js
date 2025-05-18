@@ -137,8 +137,17 @@ class cursorLine {
             this.#offset = offset;
         }
     }
+    shift(line){
+        let length = line.length;
+        if(length <= this.#offset) {
+            this.#offset = length;
+        }
+    }
     outputView(){
         return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
+    }
+    outputText(){
+        return this.#LeftBuffer + this.#CenterBuffer + this.#RightBuffer;
     }
 }
 
