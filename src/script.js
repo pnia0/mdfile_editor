@@ -32,6 +32,7 @@ class Editor {
 
 class Buffer {
     #headBuffer = "";
+    #lineNumber = 0;
     #cursor;
     #bottomBuffer = "";
     constructor(){
@@ -41,7 +42,7 @@ class Buffer {
         let firstLineBottom = this.picFirstLine(text);
         this.#cursor.init(text.substring(0, firstLineBottom+1), 0);
         this.#bottomBuffer = text.substring(firstLineBottom + 1);
-        return {headBuffer: this.#headBuffer, cursor: this.#cursor.outputCursor(), bottomBuffer: this.#bottomBuffer};
+        return this.outputView();
     }
     outputCursor(){
         return this.#cursor.outputCursor();
@@ -99,7 +100,7 @@ class Buffer {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
         test.innerHTML = this.outputText();
-        return {headBuffer: this.#headBuffer, cursorLeft: this.#cursorLeft, cursorCenter: this.#cursorCenter, cursorRight: this.#cursorRight, bottomBuffer: this.#bottomBuffer};
+        return this.outputView();
     }
     arrowUp(){
         if (!this.isUp()) {return;}
@@ -113,7 +114,10 @@ class Buffer {
         this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
-        return {headBuffer: this.#headBuffer, cursor: this.#cursor.outputCursor(), bottomBuffer: this.#bottomBuffer};
+        return this.outputView();
+    }
+    outputView(){
+        return {headBuffer: this.#headBuffer, lineNumber: this.#lineNumber, cursor: this.#cursor.outputView(), bottomBuffer: this.#bottomBuffer};
     }
 }
 
@@ -131,8 +135,8 @@ class cursorLine {
             this.#offset = offset;
         }
     }
-    outputCursor(){
-        return {leftBuffer: this.#LeftBuffer, centerBuffer: this.#CenterBuffer, rightBuffer: this.#RightBuffer};
+    outputView(){
+        return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
     }
 }
 
@@ -258,9 +262,10 @@ class View {
     }
     updateView(buffer){
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
-        this.#cursorLeft.innerText = buffer.cursorLeft;
-        this.#cursorCenter.innerText = buffer.cursorCenter;
-        this.#cursorRight.innerText = buffer.cursorRight;
+        this.#cursorLineNumberView = innerText = buffer.lineNumber;
+        this.#cursorLeft.innerText = buffer.cursor.left;
+        this.#cursorCenter.innerText = buffer.cursor.center;
+        this.#cursorRight.innerText = buffer.cursor.right;
         this.#bottomView.innerHTML = this.interpritBottom(buffer.bottomBuffer);
     }
     updateCursor(line){
