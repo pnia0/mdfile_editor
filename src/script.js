@@ -48,7 +48,7 @@ class Buffer {
         return this.#cursor.outputCursor();
     }
     outputText(){
-        return this.#headBuffer + this.cursor.outputText() + this.#bottomBuffer;
+        return this.#headBuffer + this.#cursor.outputText() + this.#bottomBuffer;
     }
     picFirstLine(text){
         let length = text.length;
@@ -130,7 +130,7 @@ class cursorLine {
     #offset = 0;
     constructor(){}
     init(line, offset){
-        length = line.length;
+        let length = line.length;
         if(length <= offset) {
             this.#offset = length;
         } else {
