@@ -99,6 +99,7 @@ class Buffer {
         } else {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
+        this.#lineNumber++;
         test.innerHTML = this.outputText();
         return this.outputView();
     }
@@ -113,6 +114,7 @@ class Buffer {
         let lastLineHead = this.picLastLine(this.#headBuffer);
         this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
+        this.#lineNumber--;
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
     }
@@ -262,7 +264,7 @@ class View {
     }
     updateView(buffer){
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
-        this.#cursorLineNumberView = innerText = buffer.lineNumber;
+        this.#cursorLineNumberView.innerText = buffer.lineNumber;
         this.#cursorLeft.innerText = buffer.cursor.left;
         this.#cursorCenter.innerText = buffer.cursor.center;
         this.#cursorRight.innerText = buffer.cursor.right;
