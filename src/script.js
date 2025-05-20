@@ -254,12 +254,12 @@ class View {
     interpritHead(headText){
         //if (headText.substring(headText.length - 1) == "\n") {headText += ""};
         if (headText == ""){return "";}
-        return markdown.parse(headText);
+        return headText;//markdown.parse(headText);
     }
     interpritBottom(bottomText){
         if (bottomText.substring(bottomText.length - 1) == "\n") {bottomText += "　"};
         if (bottomText ==""){return "";}
-        return markdown.parse(bottomText);
+        return bottomText;//markdown.parse(bottomText);
     }
     picFirstLine(text){
         let count = 0;
