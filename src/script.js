@@ -345,21 +345,11 @@ async function saveFile(editor){
     await writableStream.write(editor.outputText + "written!\n");
     await writableStream.close();
 }
-async function openFile(editor){/*
-    let targetFile = await window.showOpenFilePicker({
-        types: [
-            {
-                description: '入力ファイル',
-                accept: {
-                    'text/plain': ['.md'],
-                },
-            },
-        ],
-        excludeAcceptAllOption: true,
-    });*/
-    let targetFile = await window.showOpenFilePicker(picker0pts);
+async function openFile(editor){
+    const targetFile = await window.showOpenFilePicker();
     const reader = new FileReader();
-    await reader.readAsText(targetFile.getFile().files[0]);
+    const file = await targetFile.getFile();
+    reader.readAsText(file.files[0]);
     editor.load_text(reader.result);
 }
 let test;
