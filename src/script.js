@@ -177,8 +177,8 @@ class cursorLine {
         if (this.#CenterBuffer == '\n') {
             return {left:this.#LeftBuffer, center: ' ', right: this.#RightBuffer};
         } else {
-        return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
-    }
+            return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
+        }
     }
     outputText(){
         return (this.#LeftBuffer + this.#CenterBuffer + this.#RightBuffer);
@@ -325,10 +325,10 @@ class View {
     }
 }
 
-
 function editorInit(){
     return new Editor(document.getElementById("editor"));
 }
+
 async function saveFile(editor){
     let targetFile = await window.showOpenFilePicker({
         types: [
@@ -345,8 +345,27 @@ async function saveFile(editor){
     await writableStream.write(editor.outputText + "written!\n");
     await writableStream.close();
 }
+async function openFile(editor){
+    let targetFile = await window.showOpenFilePicker({
+        types: [
+            {
+                description: '入力ファイル',
+                accept: {
+                    'text/plain': ['.md'],
+                },
+            },
+        ],
+        excludeAcceptAllOption: true,
+    });
+    const reader = new FileReader();
+    document.getElementById("editor").innerText = targetFile;
+    await reader.readAsText(targetFile.getFile().files[0]);
+    editor.load_text(reader.result);
+}
 let test;
 let state_s = false;
+let state_o = false;
+let currentFIle;
 window.onload = async() => {
     await markdown.ready;
     let editor = editorInit();
@@ -376,8 +395,15 @@ window.onload = async() => {
             console.log(state_s);
             event.preventDefault();
             if (!state_s){
-                state_ctrl = true;
+                state_s = true;
                 saveFile(editor);
+            }
+        }
+        if (event.ctrlKey && event.key == 'o') {
+            event.preventDefault();
+            if(!state_o){
+                state_0 = true;
+                openFile(editor);
             }
         }
     })
@@ -385,6 +411,10 @@ window.onload = async() => {
         if (event.key === 's') {
             event.preventDefault();
             state_s = false;
+        }
+        if (event.key === 'o') {
+            event.preventDefault();
+            state_o = false;
         }
     })
 }
