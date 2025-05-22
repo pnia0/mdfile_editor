@@ -346,7 +346,7 @@ async function saveFile(editor){
     await writableStream.close();
 }
 async function openFile(editor){
-    const targetFile = await window.showOpenFilePicker();
+    const [targetFile] = await window.showOpenFilePicker();
     const reader = new FileReader();
     const file = await targetFile.getFile();
     reader.readAsText(file.files[0]);
