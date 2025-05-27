@@ -14,24 +14,24 @@ class Editor {
     }
     arrowDown(){
         if (!this.#buffer.isDown()) {return;}
-        this.#view.updateView(this.#buffer.arrowDown());
+        this.#view.updateView(this.#buffer.arrowDown(this.#view.outputCursor()));
         //this.#view.arrowDown(this.#buffer.outputCursor());
         //this.#view.updateCursor(this.#buffer.arrowDown());
     }
     arrowUp(){
         if (!this.#buffer.isUp()) {return;}
-        this.#view.updateView(this.#buffer.arrowUp());
+        this.#view.updateView(this.#buffer.arrowUp(this.#view.outputCursor()));
         //this.#view.arrowUp(this.#buffer.outputCursor());
         //this.#view.updateCursor(this.#buffer.arrowUp());
     }
     arrowRight(){
-        this.#view.updateView(this.#buffer.arrowRight());
+        this.#view.updateView(this.#buffer.arrowRight(this.#view.outputCursor()));
     }
     arrowLeft(){
-        this.#view.updateView(this.#buffer.arrowLeft());
+        this.#view.updateView(this.#buffer.arrowLeft(this.#view.outputCursor()));
     }
     outputText(){
-        return this.#buffer.outputText();
+        return this.#buffer.outputText(this.#view.outputCursor());
     }
     
 }
@@ -53,8 +53,8 @@ class Buffer {
     outputCursor(){
         return this.#cursor.outputCursor();
     }
-    outputText(){
-        return this.#headBuffer + this.#cursor.outputText() + this.#bottomBuffer;
+    outputText(cursorCenter){
+        return this.#headBuffer + this.#cursor.outputText(cursorCenter) + this.#bottomBuffer;
     }
     picFirstLine(text){
         let length = text.length;
@@ -88,7 +88,7 @@ class Buffer {
     }
     clearHeadLine(){}
     clearBottomLine(){}
-    arrowDown(){
+    arrowDown(cursorCenter){
         if (!this.isDown()) {return};
         //if (this.isUp()) {
         //    this.#headBuffer += "\n";
@@ -97,7 +97,7 @@ class Buffer {
         //        this.#headBuffer = "\n"
         //    }
         //}
-        this.#headBuffer += this.#cursor.outputText();
+        this.#headBuffer += this.#cursor.outputText(cursorCenter);
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
         this.#cursor.shift(this.#bottomBuffer.substring(0, firstLineBottom+1));
         if (firstLineBottom == this.#bottomBuffer.length){
@@ -106,17 +106,17 @@ class Buffer {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
         this.#lineNumber++;
-        test.innerHTML = this.outputText();
+        test.innerHTML = this.outputText(cursorCenter);
         return this.outputView();
     }
-    arrowUp(){
+    arrowUp(cursorCenter){
         if (!this.isUp()) {return;}
         //if (this.isDown()){
         //    this.#bottomBuffer = this.#cursorLeft + this.#cursorCenter + this.#cursorRight + "\n" + this.#bottomBuffer;
         //} else {
             
         //}
-        this.#bottomBuffer = this.#cursor.outputText() + this.#bottomBuffer;
+        this.#bottomBuffer = this.#cursor.outputText(cursorCenter) + this.#bottomBuffer;
         let lastLineHead = this.picLastLine(this.#headBuffer);
         this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
@@ -124,12 +124,12 @@ class Buffer {
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
     }
-    arrowRight(){
-        this.#cursor.arrowRight();
+    arrowRight(cursorCenter){
+        this.#cursor.arrowRight(cursorCenter);
         return this.outputView();
     }
-    arrowLeft(){
-        this.#cursor.arrowLeft();
+    arrowLeft(cursorCenter){
+        this.#cursor.arrowLeft(cursorCenter);
         return this.outputView();
     }
     outputView(){
@@ -150,6 +150,7 @@ class cursorLine {
         } else {
             this.#offset = offset;
         }
+        this.shift(line);
     }
     shift(line){
         let length = line.length;
@@ -160,17 +161,19 @@ class cursorLine {
         this.#CenterBuffer = line.substring(this.#offset, this.#offset +1);
         this.#RightBuffer = line.substring(this.#offset + 1);
     }
-    arrowRight(){
-        if(this.#offset < (this.outputText().length - 1)){
-            this.#offset++;
-            this.shift(this.outputText());
-            console.log("working!");
+    arrowRight(cursorCenter){
+        //this.#LeftBuffer += cursorCenter;
+        //this.#offset += cursorCenter.length;
+        let cursor = this.outputText(cursorCenter);
+        if(this.#offset < (cursor.length - 1)){
+            //this.#offset++;
+            this.shift(cursor);
         }
     }
-    arrowLeft(){
+    arrowLeft(cursorCenter){
         if (this.#offset != 0){
             this.#offset--;
-            this.shift(this.outputText());
+            this.shift(this.outputText(cursorCenter));
         }
     }
     outputView(){
@@ -180,8 +183,9 @@ class cursorLine {
             return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
         }
     }
-    outputText(){
-        return (this.#LeftBuffer + this.#CenterBuffer + this.#RightBuffer);
+    outputText(cursorCenter){
+        this.#offset += cursorCenter.length;
+        return (this.#LeftBuffer + cursorCenter + this.#RightBuffer);
     }
 }
 
@@ -192,7 +196,7 @@ class View {
     #cursorLineNumber = 1;
     #cursorLineView = "";
     #cursorLeft = "";
-    #cursorCenter = "";
+    #cursorCenter;
     #cursorRight = "";
     #bottomView = "";
     constructor(editor){
@@ -204,7 +208,7 @@ class View {
         this.#cursorLineView = document.createElement("div");
         this.#cursorLineNumberView = document.createElement("div");
         this.#cursorLeft = document.createElement("div");
-        this.#cursorCenter = document.createElement("div");
+        this.#cursorCenter = document.createElement("input");
         this.#cursorRight = document.createElement("div");
         this.#bottomView = document.createElement("div");
         editor.appendChild(this.#headView);
@@ -228,6 +232,8 @@ class View {
         this.#headView.style.paddingLeft = TEXT_AREA_OFFSET;
         this.#cursorLeft.style.paddingLeft = TEXT_AREA_OFFSET;
         this.#bottomView.style.paddingLeft = TEXT_AREA_OFFSET;
+        this.#cursorCenter.types = "text";
+        this.#cursorCenter.style.width = "auto";
         this.#headView.style.flexGrow ="1";
         this.#cursorLineView.style.flexGrow = "1";
         this.#bottomView.style.flexGrow ="1";
@@ -254,12 +260,12 @@ class View {
     interpritHead(headText){
         //if (headText.substring(headText.length - 1) == "\n") {headText += ""};
         if (headText == ""){return "";}
-        return headText;//markdown.parse(headText);
+        return markdown.parse(headText);
     }
     interpritBottom(bottomText){
         if (bottomText.substring(bottomText.length - 1) == "\n") {bottomText += "　"};
         if (bottomText ==""){return "";}
-        return bottomText;//markdown.parse(bottomText);
+        return markdown.parse(bottomText);
     }
     picFirstLine(text){
         let count = 0;
@@ -313,7 +319,7 @@ class View {
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
         this.#cursorLineNumberView.innerText = buffer.lineNumber;
         this.#cursorLeft.innerText = buffer.cursor.left;
-        this.#cursorCenter.innerText = buffer.cursor.center;
+        this.#cursorCenter.value = buffer.cursor.center;
         this.#cursorRight.innerText = buffer.cursor.right;
         this.#bottomView.innerHTML = this.interpritBottom(buffer.bottomBuffer);
     }
@@ -322,6 +328,13 @@ class View {
     }
     updateCursorLineNumber(){
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
+    }
+    outputCursor(){
+        if (this.#cursorCenter.value.length == 0){
+            return "";
+        } else {
+            return this.#cursorCenter.value;
+        }
     }
 }
 
@@ -346,10 +359,15 @@ async function saveFile(editor){
     await writableStream.close();
 }
 async function openFile(editor){
-    const targetFile = await window.showOpenFilePicker();
+    const [targetFile] = await window.showOpenFilePicker();
     const reader = new FileReader();
     const file = await targetFile.getFile();
-    reader.readAsText(file.files[0]);
+    console.log(await file.text())
+    reader.readAsText(file);
+    reader.onload = (event) => {
+        console.log(event.target.result);
+    }
+    console.log(reader);
     editor.load_text(reader.result);
 }
 let test;
@@ -408,7 +426,3 @@ window.onload = async() => {
         }
     })
 }
-
-
-
-
