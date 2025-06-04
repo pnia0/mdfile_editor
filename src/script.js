@@ -5,6 +5,7 @@ const TEXT_AREA_OFFSET = "0.5em";
 class Editor {
     #buffer
     #view
+    #target_file
     constructor(editor){
         this.#buffer = new Buffer;
         this.#view = new View(editor);
@@ -38,7 +39,7 @@ class Editor {
 
 class Buffer {
     #headBuffer = "";
-    #lineNumber = 0;
+    #lineNumber = 1;
     #cursor;
     #bottomBuffer = "";
     constructor(){
@@ -66,18 +67,19 @@ class Buffer {
     }
     picLastLine(text){
         let count = text.length;
-            while (0 <= count) {
-            if (text.substring(count - 1, count) == "\n") {
-                count--;
+        //行末の改行を検知
+        while (0 <= count) {
+            count--;
+            if (text.substring(count, count + 1) == "\n") {
                 break;
             }
-            count--;
         }
+        //前の行の行末の改行を検知
         while (0 <= count) {
-            if (text.substring(count - 1, count) == "\n") {
+            count--;
+            if (text.substring(count, count + 1) == "\n") {
                 return count;
             }
-            count--;
         }
     }
     isUp(){
@@ -111,6 +113,7 @@ class Buffer {
     }
     arrowUp(cursorCenter){
         if (!this.isUp()) {return;}
+        if (this.#lineNumber <= 1){return;}
         //if (this.isDown()){
         //    this.#bottomBuffer = this.#cursorLeft + this.#cursorCenter + this.#cursorRight + "\n" + this.#bottomBuffer;
         //} else {
@@ -118,8 +121,8 @@ class Buffer {
         //}
         this.#bottomBuffer = this.#cursor.outputText(cursorCenter) + this.#bottomBuffer;
         let lastLineHead = this.picLastLine(this.#headBuffer);
-        this.#cursor.shift(this.#headBuffer.substring(lastLineHead));
-        this.#headBuffer = this.#headBuffer.substring(0, lastLineHead);
+        this.#cursor.shift(this.#headBuffer.substring(lastLineHead + 1));
+        this.#headBuffer = this.#headBuffer.substring(0, lastLineHead + 1);
         this.#lineNumber--;
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
@@ -166,13 +169,13 @@ class cursorLine {
         //this.#offset += cursorCenter.length;
         let cursor = this.outputText(cursorCenter);
         if(this.#offset < (cursor.length - 1)){
-            //this.#offset++;
+            this.#offset++;
             this.shift(cursor);
         }
     }
     arrowLeft(cursorCenter){
         if (this.#offset != 0){
-            this.#offset--;
+            this.#offset -= 1;
             this.shift(this.outputText(cursorCenter));
         }
     }
@@ -184,7 +187,7 @@ class cursorLine {
         }
     }
     outputText(cursorCenter){
-        this.#offset += cursorCenter.length;
+        this.#offset += cursorCenter.length - 1;
         return (this.#LeftBuffer + cursorCenter + this.#RightBuffer);
     }
 }
@@ -233,7 +236,7 @@ class View {
         this.#cursorLeft.style.paddingLeft = TEXT_AREA_OFFSET;
         this.#bottomView.style.paddingLeft = TEXT_AREA_OFFSET;
         this.#cursorCenter.types = "text";
-        this.#cursorCenter.style.width = "auto";
+        this.#cursorCenter.style.width = "1em";
         this.#headView.style.flexGrow ="1";
         this.#cursorLineView.style.flexGrow = "1";
         this.#bottomView.style.flexGrow ="1";
@@ -343,32 +346,30 @@ function editorInit(){
 }
 
 async function saveFile(editor){
-    let targetFile = await window.showOpenFilePicker({
-        types: [
-            {
-                description: '保存先ファイル',
-                accept: {
-                    'text/plain': ['.md'],
+    if (!editor.targetFile){
+        [editor.targetFile] = await window.showOpenFilePicker({
+            types: [
+                {
+                    description: '保存先ファイル',
+                    accept: {
+                        'text/plain': ['.md'],
+                    },
                 },
-            },
-        ],
-        excludeAcceptAllOption: true,
-    });
-    let writableStream = await targetFile.createWritable();
-    await writableStream.write(editor.outputText + "written!\n");
+            ],
+            excludeAcceptAllOption: true,
+        });
+    }
+    let writableStream = await editor.targetFile.createWritable();
+    await writableStream.write(editor.outputText() + "written!\n");
     await writableStream.close();
 }
 async function openFile(editor){
-    const [targetFile] = await window.showOpenFilePicker();
-    const reader = new FileReader();
-    const file = await targetFile.getFile();
-    console.log(await file.text())
-    reader.readAsText(file);
-    reader.onload = (event) => {
-        console.log(event.target.result);
+    let previousTarget = editor.targetFile;
+    [editor.targetFile] = await window.showOpenFilePicker();
+    if(previousTarget != editor.targetFile){
+        const file = await editor.targetFile.getFile();
+        editor.load_text(await file.text());
     }
-    console.log(reader);
-    editor.load_text(reader.result);
 }
 let test;
 let state_s = false;
