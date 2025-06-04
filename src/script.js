@@ -284,12 +284,12 @@ class View {
         //if (headText.substring(headText.length - 1) == "\n") {headText += ""};
         if (headText == ""){return "";}
         if (headText.substring(headText.length - 2) == "\n"){headText += "　"};
-        return markdown.parse(headText);
+        return marked.parse(headText);
     }
     interpritBottom(bottomText){
         if (bottomText.substring(bottomText.length - 1) == "\n") {bottomText += "　"};
         if (bottomText ==""){return "";}
-        return markdown.parse(bottomText);
+        return marked.parse(bottomText);
     }
     picFirstLine(text){
         let count = 0;
@@ -403,7 +403,6 @@ let state_s = false;
 let state_o = false;
 let currentFIle;
 window.onload = async() => {
-    await markdown.ready;
     let editor = editorInit();
     editor.load_text(test_text);
     test = document.createElement("div");
