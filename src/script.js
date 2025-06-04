@@ -140,7 +140,19 @@ class Buffer {
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
     }
-    enter(cursorInput){}
+    enter(cursorInput){
+        let cursorStart = cursorInput.text.length - 2;
+        while(0 <= cursorStart){
+            if(cursorInput.text.substring(cursorStart, cursorStart + 1) == "\n"){break;}
+            cursorStart--;
+        }
+        if(cursorStart < 0){return this.outputView();}
+        this.#headBuffer += cursorInput.text.substring(0, cursorStart + 1);
+        this.#centerBuffer = cursorInput.text.substring(cursorStart + 1);
+        this.#lineNumber++;
+        this.#cursor = 0;
+        return this.outputView();
+    }
     /*
     arrowRight(cursorCenter){
         this.#cursor.arrowRight(cursorCenter);
