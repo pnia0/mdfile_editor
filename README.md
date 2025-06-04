@@ -10,3 +10,6 @@
 - google driveからの保存、読み込み実装
 編集対象業以外はhtmlとして表示、編集対象業のみプレーンテキストとして表示する。
 [デプロイ](./src/index.html)
+setSelectionRange(start, end);
+selectionStart
+selectionEnd
