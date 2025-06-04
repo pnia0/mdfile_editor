@@ -25,11 +25,16 @@ class Editor {
         //this.#view.arrowUp(this.#buffer.outputCursor());
         //this.#view.updateCursor(this.#buffer.arrowUp());
     }
+    /*
     arrowRight(){
         this.#view.updateView(this.#buffer.arrowRight(this.#view.outputCursor()));
     }
     arrowLeft(){
         this.#view.updateView(this.#buffer.arrowLeft(this.#view.outputCursor()));
+    }
+    */
+    enter(){
+        this.#view.updateView(this.#buffer.enter(this.#view.outputCursor()));
     }
     outputText(){
         return this.#buffer.outputText(this.#view.outputCursor());
@@ -40,22 +45,20 @@ class Editor {
 class Buffer {
     #headBuffer = "";
     #lineNumber = 1;
-    #cursor;
+    #cursor = 0;
+    #centerBuffer = "";
     #bottomBuffer = "";
-    constructor(){
-        this.#cursor = new cursorLine;
-    }
     init(text){
         let firstLineBottom = this.picFirstLine(text);
-        this.#cursor.init(text.substring(0, firstLineBottom+1), 0);
+        this.#centerBuffer = text.substring(0, firstLineBottom+1);
         this.#bottomBuffer = text.substring(firstLineBottom + 1);
         return this.outputView();
     }
     outputCursor(){
-        return this.#cursor.outputCursor();
+        return {text: this.#centerBuffer, start: this.#cursor, end: this.#cursor, lineNumber: this.#lineNumber};
     }
     outputText(cursorCenter){
-        return this.#headBuffer + this.#cursor.outputText(cursorCenter) + this.#bottomBuffer;
+        return this.#headBuffer + this.#centerBuffer + this.#bottomBuffer;
     }
     picFirstLine(text){
         let length = text.length;
@@ -90,7 +93,7 @@ class Buffer {
     }
     clearHeadLine(){}
     clearBottomLine(){}
-    arrowDown(cursorCenter){
+    arrowDown(cursorInput){
         if (!this.isDown()) {return};
         //if (this.isUp()) {
         //    this.#headBuffer += "\n";
@@ -99,19 +102,24 @@ class Buffer {
         //        this.#headBuffer = "\n"
         //    }
         //}
-        this.#headBuffer += this.#cursor.outputText(cursorCenter);
+        this.#headBuffer += cursorInput.text;
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
-        this.#cursor.shift(this.#bottomBuffer.substring(0, firstLineBottom+1));
+        this.#centerBuffer = this.#bottomBuffer.substring(0, firstLineBottom + 1);
+        if ( this.#centerBuffer.length < cursorInput.start) {
+            this.#cursor = this.#centerBuffer.length - 1;
+        } else {
+            this.#cursor = cursorInput.start;
+        }
         if (firstLineBottom == this.#bottomBuffer.length){
             this.#bottomBuffer = "";
         } else {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
         this.#lineNumber++;
-        test.innerHTML = this.outputText(cursorCenter);
+        test.innerHTML = this.outputText(cursorInput);
         return this.outputView();
     }
-    arrowUp(cursorCenter){
+    arrowUp(cursorInput){
         if (!this.isUp()) {return;}
         if (this.#lineNumber <= 1){return;}
         //if (this.isDown()){
@@ -119,14 +127,21 @@ class Buffer {
         //} else {
             
         //}
-        this.#bottomBuffer = this.#cursor.outputText(cursorCenter) + this.#bottomBuffer;
+        this.#bottomBuffer = cursorInput.text + this.#bottomBuffer;
         let lastLineHead = this.picLastLine(this.#headBuffer);
-        this.#cursor.shift(this.#headBuffer.substring(lastLineHead + 1));
+        this.#centerBuffer = (this.#headBuffer.substring(lastLineHead + 1));
+        if ( this.#centerBuffer.length < cursorInput.start) {
+            this.#cursor = this.#centerBuffer.length - 1;
+        } else {
+            this.#cursor = cursorInput.start;
+        }
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead + 1);
         this.#lineNumber--;
         //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
     }
+    enter(cursorInput){}
+    /*
     arrowRight(cursorCenter){
         this.#cursor.arrowRight(cursorCenter);
         return this.outputView();
@@ -135,8 +150,9 @@ class Buffer {
         this.#cursor.arrowLeft(cursorCenter);
         return this.outputView();
     }
+    */
     outputView(){
-        return {headBuffer: this.#headBuffer, lineNumber: this.#lineNumber, cursor: this.#cursor.outputView(), bottomBuffer: this.#bottomBuffer};
+        return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: this.#bottomBuffer};
     }
 }
 
@@ -198,9 +214,7 @@ class View {
     #cursorLineNumberView = "1";
     #cursorLineNumber = 1;
     #cursorLineView = "";
-    #cursorLeft = "";
-    #cursorCenter;
-    #cursorRight = "";
+    #cursorInput;
     #bottomView = "";
     constructor(editor){
         editor.style.width = "100%";
@@ -210,18 +224,14 @@ class View {
         this.#cursorLineViewArea = document.createElement("div");
         this.#cursorLineView = document.createElement("div");
         this.#cursorLineNumberView = document.createElement("div");
-        this.#cursorLeft = document.createElement("div");
-        this.#cursorCenter = document.createElement("input");
-        this.#cursorRight = document.createElement("div");
+        this.#cursorInput = document.createElement("textarea");
         this.#bottomView = document.createElement("div");
         editor.appendChild(this.#headView);
         editor.appendChild(this.#cursorLineViewArea);
         editor.appendChild(this.#bottomView);
         this.#cursorLineViewArea.appendChild(this.#cursorLineNumberView);
         //this.#cursorLineViewArea.appendChild(this.#cursorLineView);
-        this.#cursorLineViewArea.appendChild(this.#cursorLeft);
-        this.#cursorLineViewArea.appendChild(this.#cursorCenter);
-        this.#cursorLineViewArea.appendChild(this.#cursorRight);
+        this.#cursorLineViewArea.appendChild(this.#cursorInput);
         this.#cursorLineViewArea.style.display = "flex";
         this.#cursorLineViewArea.style.flexDirection = "row";
         this.#cursorLineViewArea.style.width = "100%";
@@ -233,20 +243,18 @@ class View {
         this.#headView.style.marginLeft = LINE_NUMBER_OFFSET;
         this.#bottomView.style.marginLeft = LINE_NUMBER_OFFSET;
         this.#headView.style.paddingLeft = TEXT_AREA_OFFSET;
-        this.#cursorLeft.style.paddingLeft = TEXT_AREA_OFFSET;
+        this.#cursorInput.style.paddingLeft = TEXT_AREA_OFFSET;
         this.#bottomView.style.paddingLeft = TEXT_AREA_OFFSET;
-        this.#cursorCenter.types = "text";
-        this.#cursorCenter.style.width = "1em";
+        //this.#cursorCenter.types = "textarea";
+        this.#cursorInput.style.width = "1em";
         this.#headView.style.flexGrow ="1";
         this.#cursorLineView.style.flexGrow = "1";
         this.#bottomView.style.flexGrow ="1";
         this.#headView.style.border= "2px solid #ff0000";
         this.#cursorLineViewArea.style.border= "2px solid #ffff00";
         this.#bottomView.style.border= "2px solid #00ff00";
-        this.#cursorCenter.style.backgroundColor= "#888888";
-        this.#cursorLeft.style.whiteSpace = "break-spaces";
-        this.#cursorCenter.style.whiteSpace = "break-spaces";
-        this.#cursorRight.style.whiteSpace = "break-spaces";
+        this.#cursorInput.style.backgroundColor= "#888888";
+        this.#cursorInput.style.whiteSpace = "break-spaces";
         this.#cursorLineNumber = 1;
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
     }
@@ -263,6 +271,7 @@ class View {
     interpritHead(headText){
         //if (headText.substring(headText.length - 1) == "\n") {headText += ""};
         if (headText == ""){return "";}
+        if (headText.substring(headText.length - 2) == "\n"){headText += "　"};
         return markdown.parse(headText);
     }
     interpritBottom(bottomText){
@@ -294,8 +303,7 @@ class View {
     isDown(){
         return "" != this.#bottomView.innerHTML;
     }
-    clearHeadLine(text){}
-    clearBottomLine(text){}
+    /*
     arrowDown(line){
         if (!this.isDown()) {return;}
         if (this.isUp) {
@@ -318,12 +326,19 @@ class View {
         this.updateCursorLineNumber();
         return;
     }
+        */
+    enter(){
+        for (char in this.#cursorInput){
+            if (char === '\n'){
+                console.log("enter");
+            }
+        }
+    }
     updateView(buffer){
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
-        this.#cursorLineNumberView.innerText = buffer.lineNumber;
-        this.#cursorLeft.innerText = buffer.cursor.left;
-        this.#cursorCenter.value = buffer.cursor.center;
-        this.#cursorRight.innerText = buffer.cursor.right;
+        this.#cursorLineNumberView.innerText = buffer.centerBuffer.lineNumber;
+        this.#cursorInput.value = buffer.centerBuffer.text;
+        this.#cursorInput.setSelectionRange(buffer.centerBuffer.start, buffer.centerBuffer.end);
         this.#bottomView.innerHTML = this.interpritBottom(buffer.bottomBuffer);
     }
     updateCursor(line){
@@ -333,10 +348,10 @@ class View {
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
     }
     outputCursor(){
-        if (this.#cursorCenter.value.length == 0){
+        if (this.#cursorInput.value.length == 0){
             return "";
         } else {
-            return this.#cursorCenter.value;
+            return {text: this.#cursorInput.value, start: this.#cursorInput.selectionStart, end: this.#cursorInput.selectionEnd};
         }
     }
 }
@@ -392,6 +407,7 @@ window.onload = async() => {
             event.preventDefault();
             editor.arrowUp();
         }
+        /*
         if (event.key === 'ArrowRight'){
             event.preventDefault();
             editor.arrowRight();
@@ -400,6 +416,7 @@ window.onload = async() => {
             event.preventDefault();
             editor.arrowLeft();
         }
+        */
         if (event.ctrlKey && event.key === 's') {
             console.log(state_s);
             event.preventDefault();
@@ -417,6 +434,9 @@ window.onload = async() => {
         }
     })
     document.addEventListener("keyup", function(event){
+        if (event.key === 'Enter'){
+            editor.enter();
+        }
         if (event.key === 's') {
             event.preventDefault();
             state_s = false;
