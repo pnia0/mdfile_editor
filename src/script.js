@@ -46,11 +46,13 @@ class Buffer {
     #headBuffer = "";
     #lineNumber = 1;
     #cursor = 0;
+    #isCenterenter = false;
     #centerBuffer = "";
     #bottomBuffer = "";
     init(text){
         let firstLineBottom = this.picFirstLine(text);
-        this.#centerBuffer = text.substring(0, firstLineBottom+1);
+        this.#centerBuffer = text.substring(0, firstLineBottom);
+        this.#isCenterenter = true;
         this.#bottomBuffer = text.substring(firstLineBottom + 1);
         return this.outputView();
     }
@@ -71,19 +73,23 @@ class Buffer {
     picLastLine(text){
         let count = text.length;
         //行末の改行を検知
-        while (0 <= count) {
-            count--;
-            if (text.substring(count, count + 1) == "\n") {
+        while (0 < count) {
+            if (text.substring(count - 1, count) == "\n") {
+                count--;
                 break;
             }
+            count--;
         }
         //前の行の行末の改行を検知
-        while (0 <= count) {
-            count--;
-            if (text.substring(count, count + 1) == "\n") {
+        while (0 < count) {
+            if (text.substring(count - 1, count) == "\n") {
+                count--;
                 return count;
             }
+            count--;
         }
+        count--;
+        return count;
     }
     isUp(){
         return "" != this.#headBuffer;
@@ -102,9 +108,21 @@ class Buffer {
         //        this.#headBuffer = "\n"
         //    }
         //}
-        this.#headBuffer += cursorInput.text;
+        this.#headBuffer += cursorInput.text + "\n";
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
-        this.#centerBuffer = this.#bottomBuffer.substring(0, firstLineBottom + 1);
+        if(this.#bottomBuffer.substring(firstLineBottom, firstLineBottom +1) == "\n"){
+            this.#centerBuffer = this.#bottomBuffer.substring(0, firstLineBottom);
+            this.#isCenterenter = true;
+            if(firstLineBottom == 0){
+                this.#centerBuffer = "";
+            }
+        } else {
+            this.#centerBuffer = this.#bottomBuffer.substring(0, firstLineBottom + 1);
+            this.#isCenterenter = false;
+            if(firstLineBottom == -1){
+                this.#centerBuffer = "";
+            }
+        }
         if ( this.#centerBuffer.length < cursorInput.start) {
             this.#cursor = this.#centerBuffer.length - 1;
         } else {
@@ -127,9 +145,18 @@ class Buffer {
         //} else {
             
         //}
-        this.#bottomBuffer = cursorInput.text + this.#bottomBuffer;
+        if (this.#isCenterenter){
+            this.#bottomBuffer = cursorInput.text + "\n" + this.#bottomBuffer;
+        } else {
+            this.#bottomBuffer = cursorInput.text + this.#bottomBuffer;
+        }
         let lastLineHead = this.picLastLine(this.#headBuffer);
-        this.#centerBuffer = (this.#headBuffer.substring(lastLineHead + 1));
+        if (this.#headBuffer.length - 1 == lastLineHead) {
+            this.#centerBuffer = "";
+        } else {
+            this.#centerBuffer = (this.#headBuffer.substring(lastLineHead + 1, this.#headBuffer.length - 1));
+        }
+        this.#isCenterenter = true;
         if ( this.#centerBuffer.length < cursorInput.start) {
             this.#cursor = this.#centerBuffer.length - 1;
         } else {
@@ -141,10 +168,11 @@ class Buffer {
         return this.outputView();
     }
     enter(cursorInput){
-        let cursorStart = cursorInput.text.length - 2;
+        let cursorStart;
+        cursorStart = cursorInput.text.length;
         while(0 <= cursorStart){
-            if(cursorInput.text.substring(cursorStart, cursorStart + 1) == "\n"){break;}
             cursorStart--;
+            if(cursorInput.text.substring(cursorStart, cursorStart + 1) == "\n"){break;}
         }
         if(cursorStart < 0){return this.outputView();}
         this.#headBuffer += cursorInput.text.substring(0, cursorStart + 1);
@@ -281,9 +309,8 @@ class View {
         return text;
     }
     interpritHead(headText){
-        //if (headText.substring(headText.length - 1) == "\n") {headText += ""};
+        if (headText.substring(0, 1) == "\n") {headText = "<br>" + headText};
         if (headText == ""){return "";}
-        if (headText.substring(headText.length - 2) == "\n"){headText += "　"};
         return marked.parse(headText);
     }
     interpritBottom(bottomText){
@@ -338,14 +365,7 @@ class View {
         this.updateCursorLineNumber();
         return;
     }
-        */
-    enter(){
-        for (char in this.#cursorInput){
-            if (char === '\n'){
-                console.log("enter");
-            }
-        }
-    }
+    */
     updateView(buffer){
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
         this.#cursorLineNumberView.innerText = buffer.centerBuffer.lineNumber;
@@ -361,7 +381,7 @@ class View {
     }
     outputCursor(){
         if (this.#cursorInput.value.length == 0){
-            return "";
+            return {text: this.#cursorInput.value, start: this.#cursorInput.selectionStart, end: this.#cursorInput.selectionEnd};
         } else {
             return {text: this.#cursorInput.value, start: this.#cursorInput.selectionStart, end: this.#cursorInput.selectionEnd};
         }
