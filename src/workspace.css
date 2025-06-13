@@ -1,0 +1,55 @@
+:root{
+    --line-number-offset: 60px;
+    --text-area-offset: 0.5em;
+}
+#workspace{
+    display: flex;
+    flex-direction: column;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+}
+#toolbar{
+    width: 100%;
+    height: 2rem;
+    border-bottom: 1.5px gray solid;
+}
+#editor{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+#headView{
+    margin-left: var(--line-number-offset);
+    padding-left: var(--text-area-offset);
+    flex-grow: 1;
+}
+#cursorInput{
+    width: fit-content;
+    height: 1.5em;
+    resize: none;
+    padding-left: var(--text-area-offset);
+    background: white;
+    background-color: white;
+
+    white-space: break-spaces;
+}
+#cursorLineArea{
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+}
+#cursorLineNumber{
+    width: var(--line-number-offset);
+    text-align: right;
+}
+.textarea{
+    background-color: white;
+}
+#bottomView{
+    margin-left: var(--line-number-offset);
+    padding-left: var(--text-area-offset);
+    flex-grow: 1;
+}

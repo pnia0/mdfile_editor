@@ -272,37 +272,19 @@ class View {
         this.#cursorLineViewArea.appendChild(this.#cursorLineNumberView);
         //this.#cursorLineViewArea.appendChild(this.#cursorLineView);
         this.#cursorLineViewArea.appendChild(this.#cursorInput);
-        this.#cursorLineViewArea.style.display = "flex";
-        this.#cursorLineViewArea.style.flexDirection = "row";
-        this.#cursorLineViewArea.style.width = "100%";
-        //this.#cursorLineView.overflowWrap = "anywhere";
-        this.#cursorLineNumberView.style.width = LINE_NUMBER_OFFSET;
-        this.#cursorLineNumberView.style.textAlign = "right";
-        //this.#headView.style.whiteSpace = "pre-line";
-        //this.#bottomView.style.whiteSpace = "pre-line";
-        this.#headView.style.marginLeft = LINE_NUMBER_OFFSET;
-        this.#bottomView.style.marginLeft = LINE_NUMBER_OFFSET;
-        this.#headView.style.paddingLeft = TEXT_AREA_OFFSET;
-        this.#cursorInput.style.paddingLeft = TEXT_AREA_OFFSET;
-        this.#bottomView.style.paddingLeft = TEXT_AREA_OFFSET;
-        //this.#cursorCenter.types = "textarea";
-        this.#cursorInput.style.width = "1em";
-        this.#headView.style.flexGrow ="1";
-        this.#cursorLineView.style.flexGrow = "1";
-        this.#bottomView.style.flexGrow ="1";
+
         this.#headView.style.border= "2px solid #ff0000";
         this.#cursorLineViewArea.style.border= "2px solid #ffff00";
         this.#bottomView.style.border= "2px solid #00ff00";
-        this.#cursorInput.style.backgroundColor= "#888888";
-        this.#cursorInput.style.whiteSpace = "break-spaces";
+
         this.#cursorLineNumber = 1;
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
     }
-    init(text){
-        let firstLineBottom = this.picFirstLine(text);
-
-        this.#cursorLineView.innerText = text.substring(0, firstLineBottom);
-        this.#bottomView.innerHTML = this.initInterprit(text.substring(firstLineBottom + 1));
+        this.#headView.id = "headView";
+        this.#cursorLineViewArea.id = "cursorLineArea";
+        this.#cursorInput.id = "cursorInput";
+        this.#cursorLineNumberView.id = "cursorLineNumber";
+        this.#bottomView.id = "bottomView";
     }
     initInterprit(text){
         if (text.substring(text.length - 1) == "\n") {text += "　"};
