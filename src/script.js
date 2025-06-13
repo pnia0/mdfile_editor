@@ -249,28 +249,17 @@ class cursorLine {
 }
 
 class View {
-    #headView = "";
-    #cursorLineViewArea = null;
-    #cursorLineNumberView = "1";
+    #headView = document.createElement("div");
+    #cursorLineViewArea = document.createElement("div");
+    #cursorLineNumberView = document.createElement("div");
+    #cursorInput = document.createElement("textarea");
+    #bottomView = document.createElement("div");
     #cursorLineNumber = 1;
-    #cursorLineView = "";
-    #cursorInput;
-    #bottomView = "";
     constructor(editor){
-        editor.style.width = "100%";
-        editor.style.display = "flex";
-        editor.style.flexDirection = "column"
-        this.#headView = document.createElement("div");
-        this.#cursorLineViewArea = document.createElement("div");
-        this.#cursorLineView = document.createElement("div");
-        this.#cursorLineNumberView = document.createElement("div");
-        this.#cursorInput = document.createElement("textarea");
-        this.#bottomView = document.createElement("div");
         editor.appendChild(this.#headView);
         editor.appendChild(this.#cursorLineViewArea);
         editor.appendChild(this.#bottomView);
         this.#cursorLineViewArea.appendChild(this.#cursorLineNumberView);
-        //this.#cursorLineViewArea.appendChild(this.#cursorLineView);
         this.#cursorLineViewArea.appendChild(this.#cursorInput);
 
         this.#headView.style.border= "2px solid #ff0000";
@@ -278,8 +267,8 @@ class View {
         this.#bottomView.style.border= "2px solid #00ff00";
 
         this.#cursorLineNumber = 1;
-        this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
-    }
+        this.updateCursorLineNumber();
+
         this.#headView.id = "headView";
         this.#cursorLineViewArea.id = "cursorLineArea";
         this.#cursorInput.id = "cursorInput";
@@ -354,9 +343,6 @@ class View {
         this.#cursorInput.value = buffer.centerBuffer.text;
         this.#cursorInput.setSelectionRange(buffer.centerBuffer.start, buffer.centerBuffer.end);
         this.#bottomView.innerHTML = this.interpritBottom(buffer.bottomBuffer);
-    }
-    updateCursor(line){
-        this.#cursorLineView.innerText = line;
     }
     updateCursorLineNumber(){
         this.#cursorLineNumberView.innerText = this.#cursorLineNumber;
