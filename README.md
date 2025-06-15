@@ -1,7 +1,6 @@
+# datastructure
+このエディタにはバッファとビューの二つのデータ構造があります。ファイルのデータは選択された行をビュー、その前後をバッファに保持します。選択された行の文字列はそのままtextareaに保持され、ユーザーによって直接操作されます。一方、前後のデータはプレーンテキストをビューに渡し、インタープリタを通したのち、ビュー側のdivのinnerTextに入力し、ユーザに提示します。行をまたぐカーソルの移動が生じた場合には、選択されている行のデータをビューからバッファに渡した後、バッファ側でデータを処理し、新しい選択行、前後のデータをビューに渡し、ユーザーに提示します。
 # roadmap
 - cssしっかりやろう。
 - google driveからの保存、読み込み実装
-- vim互換の編集機能を付加
-# 参考
-[data storucture](https://nkon.github.io/Texteditor/)
-[local file edit](https://developer.mozilla.org/ja/docs/Web/API/File_API/Using_files_from_web_applications)
+- vim互換の編集機能を追加
