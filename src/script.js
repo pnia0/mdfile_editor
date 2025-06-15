@@ -10,29 +10,21 @@ class Editor {
         this.#buffer = new Buffer;
         this.#view = new View(editor);
     }
+
     load_text(text){
         this.#view.updateView(this.#buffer.init(text));
     }
+
     arrowDown(){
         if (!this.#buffer.isDown()) {return;}
         this.#view.updateView(this.#buffer.arrowDown(this.#view.outputCursor()));
-        //this.#view.arrowDown(this.#buffer.outputCursor());
-        //this.#view.updateCursor(this.#buffer.arrowDown());
     }
+
     arrowUp(){
         if (!this.#buffer.isUp()) {return;}
         this.#view.updateView(this.#buffer.arrowUp(this.#view.outputCursor()));
-        //this.#view.arrowUp(this.#buffer.outputCursor());
-        //this.#view.updateCursor(this.#buffer.arrowUp());
     }
-    /*
-    arrowRight(){
-        this.#view.updateView(this.#buffer.arrowRight(this.#view.outputCursor()));
-    }
-    arrowLeft(){
-        this.#view.updateView(this.#buffer.arrowLeft(this.#view.outputCursor()));
-    }
-    */
+
     enter(){
         this.#view.updateView(this.#buffer.enter(this.#view.outputCursor()));
     }
@@ -54,7 +46,6 @@ class Editor {
     outputText(){
         return this.#buffer.outputText(this.#view.outputCursor());
     }
-    
 }
 
 class Buffer {
@@ -112,17 +103,8 @@ class Buffer {
     isDown(){
         return "" != this.#bottomBuffer;
     }
-    clearHeadLine(){}
-    clearBottomLine(){}
     arrowDown(cursorInput){
         if (!this.isDown()) {return};
-        //if (this.isUp()) {
-        //    this.#headBuffer += "\n";
-        //} else {
-        //    if (this.#cursorLeft == "") {
-        //        this.#headBuffer = "\n"
-        //    }
-        //}
         this.#headBuffer += cursorInput.text + "\n";
         let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
         if(this.#bottomBuffer.substring(firstLineBottom, firstLineBottom +1) == "\n"){
@@ -155,11 +137,6 @@ class Buffer {
     arrowUp(cursorInput){
         if (!this.isUp()) {return;}
         if (this.#lineNumber <= 1){return;}
-        //if (this.isDown()){
-        //    this.#bottomBuffer = this.#cursorLeft + this.#cursorCenter + this.#cursorRight + "\n" + this.#bottomBuffer;
-        //} else {
-            
-        //}
         if (this.#isCenterenter){
             this.#bottomBuffer = cursorInput.text + "\n" + this.#bottomBuffer;
         } else {
@@ -179,7 +156,6 @@ class Buffer {
         }
         this.#headBuffer = this.#headBuffer.substring(0, lastLineHead + 1);
         this.#lineNumber--;
-        //if (this.#headBuffer != "") {this.#headBuffer += "/n";}
         return this.outputView();
     }
     enter(cursorInput){
@@ -230,16 +206,6 @@ class Buffer {
         }
         return this.outputView();
     }
-    /*
-    arrowRight(cursorCenter){
-        this.#cursor.arrowRight(cursorCenter);
-        return this.outputView();
-    }
-    arrowLeft(cursorCenter){
-        this.#cursor.arrowLeft(cursorCenter);
-        return this.outputView();
-    }
-    */
     outputView(){
         return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: this.#bottomBuffer};
     }
@@ -270,8 +236,6 @@ class cursorLine {
         this.#RightBuffer = line.substring(this.#offset + 1);
     }
     arrowRight(cursorCenter){
-        //this.#LeftBuffer += cursorCenter;
-        //this.#offset += cursorCenter.length;
         let cursor = this.outputText(cursorCenter);
         if(this.#offset < (cursor.length - 1)){
             this.#offset++;
@@ -368,30 +332,6 @@ class View {
     isRightest(){
         return this.#cursorInput.selectionStart == this.#cursorInput.value.length;
     }
-    /*
-    arrowDown(line){
-        if (!this.isDown()) {return;}
-        if (this.isUp) {
-            this.#headView.innerHTML = this.interpritHead(this.#headView.innerHTML + "\n" + line);
-        } else {
-            this.#headView.innerHTML = this.interpritHead(line);
-        }
-        let firstLineBottom = this.picFirstLine(this.#bottomView.innerHTML);
-        this.#bottomView.innerHTML = this.#bottomView.innerHTML.substring(firstLineBottom + 1);
-        this.#cursorLineNumber++;
-        this.updateCursorLineNumber();
-        return;
-    }
-    arrowUp(line){
-        if (!this.isUp()) {return;}
-        this.#bottomView.innerHTML = this.interpritBottom(line + "\n" + this.#bottomView.innerHTML);
-        let lastLineHead = this.picLastLine(this.#headView.innerHTML);
-        this.#headView.innerHTML = this.#headView.innerHTML.substring(0, lastLineHead - 1);
-        this.#cursorLineNumber--;
-        this.updateCursorLineNumber();
-        return;
-    }
-    */
     updateView(buffer){
         this.#headView.innerHTML = this.interpritHead(buffer.headBuffer);
         this.#cursorLineNumberView.innerText = buffer.centerBuffer.lineNumber;
