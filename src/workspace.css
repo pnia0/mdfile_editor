@@ -26,11 +26,12 @@
     flex-grow: 1;
 }
 #cursorInput{
-    width: fit-content;
-    height: 1.5em;
+    field-sizing: content;
+    max-height: 100%;
+    flex-grow: 1;
     resize: none;
     padding-left: var(--text-area-offset);
-    background: white;
+    border: none;
     background-color: white;
 
     white-space: break-spaces;
@@ -44,9 +45,6 @@
 #cursorLineNumber{
     width: var(--line-number-offset);
     text-align: right;
-}
-.textarea{
-    background-color: white;
 }
 #bottomView{
     margin-left: var(--line-number-offset);
