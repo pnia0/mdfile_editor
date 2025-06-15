@@ -165,7 +165,7 @@ class Buffer {
         }
         this.#isCenterenter = true;
         if ( this.#centerBuffer.length < cursorInput.start) {
-            this.#cursor = this.#centerBuffer.length - 1;
+            this.#cursor = this.#centerBuffer.length;
         } else {
             this.#cursor = cursorInput.start;
         }
