@@ -359,6 +359,29 @@ class View {
 function editorInit(){
     return new Editor(document.getElementById("editor"));
 }
+function toolBarInit(area){
+    let buttonOpen = document.createElement("input");
+    buttonOpen.type = "button";
+    buttonOpen.value = "Open";
+    buttonOpen.classList = "headButton";
+    buttonOpen.addEventListener("click", openFile);
+
+    let buttonSave = document.createElement("input");
+    buttonSave.type = "button";
+    buttonSave.value = "Save";
+    buttonSave.classList = "headButton";
+    buttonSave.addEventListener("click", saveFile);
+
+    let buttonNew = document.createElement("input");
+    buttonNew.type = "button";
+    buttonNew.value = "new";
+    buttonNew.classList = "headButton";
+    buttonNew.addEventListener("click", newFile);
+
+    area.appendChild(buttonOpen);
+    area.appendChild(buttonSave);
+    area.appendChild(buttonNew);
+}
 
 async function saveFile(editor){
     if (!editor.targetFile){
@@ -386,6 +409,7 @@ async function openFile(editor){
         editor.load_text(await file.text());
     }
 }
+function newFile(){}
 let test;
 let state_s = false;
 let state_o = false;
@@ -397,6 +421,7 @@ window.onload = async() => {
     document.getElementById("editor").appendChild(test);
     test.style.whiteSpace = "pre-line";
     test.innerText = editor.outputText();
+    toolBarInit(document.getElementById("toolbar"));
     document.addEventListener("keydown", function(event){
         if (event.key === 'ArrowDown') {
             event.preventDefault();

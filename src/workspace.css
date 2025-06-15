@@ -53,3 +53,9 @@
     padding-left: var(--text-area-offset);
     flex-grow: 1;
 }
+.headButton{
+    margin-left: 3px;
+    margin-right: 3px;
+    background-color: white;
+    border: 1.5px gray solid;
+}
