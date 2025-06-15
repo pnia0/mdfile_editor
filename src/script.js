@@ -43,6 +43,14 @@ class Editor {
         console.log("backspace");
         this.#view.updateView(this.#buffer.backspace(this.#view.outputCursor()));
     }
+
+    delete(event){
+        if (this.#view.isRightest()) {event.preventDefault();} else {return;}
+        if (!this.#buffer.isDown()) {return;}
+        console.log("delete");
+        this.#view.updateView(this.#buffer.delete(this.#view.outputCursor()));
+    }
+
     outputText(){
         return this.#buffer.outputText(this.#view.outputCursor());
     }
@@ -201,6 +209,27 @@ class Buffer {
         this.#lineNumber--;
         return this.outputView();
     }
+    delete(cursorInput){
+        this.#cursor = cursorInput.start;
+        let firstLineBottom = this.picFirstLine(this.#bottomBuffer);
+        if(this.#bottomBuffer.substring(firstLineBottom, firstLineBottom + 1) == "\n"){
+            if(firstLineBottom != 0) {
+                this.#centerBuffer += this.#bottomBuffer.substring(0, firstLineBottom);
+                this.#isCenterenter = true;
+            }
+        } else {
+            if(firstLineBottom != -1) {
+                this.#centerBuffer += this.#bottomBuffer.substring(0, firstLineBottom + 1);
+                this.#isCenterenter = false;
+            }
+        }
+        if(firstLineBottom == this.#bottomBuffer.length){
+            this.#bottomBuffer = "";
+        } else {
+            this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
+        }
+        return this.outputView();
+    }
     /*
     arrowRight(cursorCenter){
         this.#cursor.arrowRight(cursorCenter);
@@ -336,6 +365,9 @@ class View {
     isLeftest(){
         return this.#cursorInput.selectionEnd == 0;
     }
+    isRightest(){
+        return this.#cursorInput.selectionStart == this.#cursorInput.value.length;
+    }
     /*
     arrowDown(line){
         if (!this.isDown()) {return;}
@@ -456,6 +488,9 @@ window.onload = async() => {
         }
         if (event.key === 'Backspace') {
             editor.backspace(event);
+        }
+        if (event.key === 'Delete') {
+            editor.delete(event);
         }
         /*
         if (event.key === 'ArrowRight'){
