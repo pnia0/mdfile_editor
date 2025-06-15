@@ -36,6 +36,13 @@ class Editor {
     enter(){
         this.#view.updateView(this.#buffer.enter(this.#view.outputCursor()));
     }
+
+    backspace(event){
+        if (this.#view.isLeftest()) {event.preventDefault();} else {return;}
+        if (!this.#buffer.isUp()) {return;}
+        console.log("backspace");
+        this.#view.updateView(this.#buffer.backspace(this.#view.outputCursor()));
+    }
     outputText(){
         return this.#buffer.outputText(this.#view.outputCursor());
     }
@@ -181,6 +188,19 @@ class Buffer {
         this.#cursor = 0;
         return this.outputView();
     }
+    backspace(cursorInput){
+        let lastLineHead = this.picLastLine(this.#headBuffer);
+        if (this.#headBuffer.length - 1 == lastLineHead) {
+            this.#centerBuffer = "";
+        } else {
+            this.#centerBuffer = (this.#headBuffer.substring(lastLineHead + 1, this.#headBuffer.length - 1));
+        }
+        this.#headBuffer = this.#headBuffer.substring(0, lastLineHead + 1);
+        this.#cursor = this.#centerBuffer.length;
+        this.#centerBuffer += cursorInput.text;
+        this.#lineNumber--;
+        return this.outputView();
+    }
     /*
     arrowRight(cursorCenter){
         this.#cursor.arrowRight(cursorCenter);
@@ -313,6 +333,9 @@ class View {
     isDown(){
         return "" != this.#bottomView.innerHTML;
     }
+    isLeftest(){
+        return this.#cursorInput.selectionEnd == 0;
+    }
     /*
     arrowDown(line){
         if (!this.isDown()) {return;}
@@ -430,6 +453,9 @@ window.onload = async() => {
         if (event.key === 'ArrowUp') {
             event.preventDefault();
             editor.arrowUp();
+        }
+        if (event.key === 'Backspace') {
+            editor.backspace(event);
         }
         /*
         if (event.key === 'ArrowRight'){
