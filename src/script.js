@@ -32,14 +32,12 @@ class Editor {
     backspace(event){
         if (this.#view.isLeftest()) {event.preventDefault();} else {return;}
         if (!this.#buffer.isUp()) {return;}
-        console.log("backspace");
         this.#view.updateView(this.#buffer.backspace(this.#view.outputCursor()));
     }
 
     delete(event){
         if (this.#view.isRightest()) {event.preventDefault();} else {return;}
         if (!this.#buffer.isDown()) {return;}
-        console.log("delete");
         this.#view.updateView(this.#buffer.delete(this.#view.outputCursor()));
     }
 
@@ -211,56 +209,6 @@ class Buffer {
     }
 }
 
-class cursorLine {
-    #LeftBuffer = "";
-    #CenterBuffer = "";
-    #RightBuffer = "";
-    #offset = 0;
-    constructor(){}
-    init(line, offset){
-        let length = line.length;
-        if(length <= offset) {
-            this.#offset = length - 1;
-        } else {
-            this.#offset = offset;
-        }
-        this.shift(line);
-    }
-    shift(line){
-        let length = line.length;
-        if(length <= this.#offset) {
-            this.#offset = length - 1;
-        }
-        this.#LeftBuffer = line.substring(0, this.#offset);
-        this.#CenterBuffer = line.substring(this.#offset, this.#offset +1);
-        this.#RightBuffer = line.substring(this.#offset + 1);
-    }
-    arrowRight(cursorCenter){
-        let cursor = this.outputText(cursorCenter);
-        if(this.#offset < (cursor.length - 1)){
-            this.#offset++;
-            this.shift(cursor);
-        }
-    }
-    arrowLeft(cursorCenter){
-        if (this.#offset != 0){
-            this.#offset -= 1;
-            this.shift(this.outputText(cursorCenter));
-        }
-    }
-    outputView(){
-        if (this.#CenterBuffer == '\n') {
-            return {left:this.#LeftBuffer, center: ' ', right: this.#RightBuffer};
-        } else {
-            return {left: this.#LeftBuffer, center: this.#CenterBuffer, right: this.#RightBuffer};
-        }
-    }
-    outputText(cursorCenter){
-        this.#offset += cursorCenter.length - 1;
-        return (this.#LeftBuffer + cursorCenter + this.#RightBuffer);
-    }
-}
-
 class View {
     #headView = document.createElement("div");
     #cursorLineViewArea = document.createElement("div");
@@ -354,6 +302,7 @@ class View {
 function editorInit(){
     return new Editor(document.getElementById("editor"));
 }
+
 function toolBarInit(area){
     let buttonOpen = document.createElement("input");
     buttonOpen.type = "button";
@@ -396,6 +345,7 @@ async function saveFile(editor){
     await writableStream.write(editor.outputText() + "written!\n");
     await writableStream.close();
 }
+
 async function openFile(editor){
     let previousTarget = editor.targetFile;
     [editor.targetFile] = await window.showOpenFilePicker();
@@ -404,6 +354,7 @@ async function openFile(editor){
         editor.load_text(await file.text());
     }
 }
+
 function newFile(){}
 let test;
 let state_s = false;
