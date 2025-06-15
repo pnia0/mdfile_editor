@@ -241,12 +241,13 @@ class View {
         return text;
     }
     interpritHead(headText){
-        if (headText.substring(0, 1) == "\n") {headText = "<br>" + headText};
+        if (headText.substring(0, 1) == "\n") {headText = "<br>\n\n" + headText.substring(1)};
+        if (headText.substring(headText.length - 2, headText.length - 1) == "\n") {headText += "<br>";}
         if (headText == ""){return "";}
         return marked.parse(headText);
     }
     interpritBottom(bottomText){
-        if (bottomText.substring(bottomText.length - 1) == "\n") {bottomText += "　"};
+        if (bottomText.substring(bottomText.length - 1) == "\n") {bottomText += "<br>";}
         if (bottomText ==""){return "";}
         return marked.parse(bottomText);
     }
