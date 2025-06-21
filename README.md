@@ -4,3 +4,6 @@
 - cssしっかりやろう。
 - google driveからの保存、読み込み実装
 - vim互換の編集機能を追加
+
+# License
+This project is licensed under the MIT License, see the LICENSE file for details
