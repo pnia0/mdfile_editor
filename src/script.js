@@ -64,7 +64,11 @@ class Buffer {
         return {text: this.#centerBuffer, start: this.#cursor, end: this.#cursor, lineNumber: this.#lineNumber};
     }
     outputText(cursorCenter){
-        return this.#headBuffer + this.#centerBuffer + this.#bottomBuffer;
+        if (this.#isCenterenter) {
+            return this.#headBuffer + cursorCenter.text + "\n" + this.#bottomBuffer;
+        } else {
+            return this.#headBuffer + cursorCenter.text + this.#bottomBuffer;
+        }
     }
     picFirstLine(text){
         let length = text.length;
@@ -343,7 +347,7 @@ async function saveFile(editor){
         });
     }
     let writableStream = await editor.targetFile.createWritable();
-    await writableStream.write(editor.outputText() + "written!\n");
+    await writableStream.write(editor.outputText());
     await writableStream.close();
 }
 
