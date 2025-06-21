@@ -133,7 +133,6 @@ class Buffer {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
         this.#lineNumber++;
-        test.innerHTML = this.outputText(cursorInput);
         return this.outputView();
     }
     arrowUp(cursorInput){
@@ -227,9 +226,11 @@ class View {
         this.#cursorLineViewArea.appendChild(this.#cursorLineNumberView);
         this.#cursorLineViewArea.appendChild(this.#cursorInput);
 
+        /*for debug
         this.#headView.style.border= "2px solid #ff0000";
         this.#cursorLineViewArea.style.border= "2px solid #ffff00";
         this.#bottomView.style.border= "2px solid #00ff00";
+        */
 
         this.#cursorLineNumber = 1;
         this.updateCursorLineNumber();
@@ -368,10 +369,6 @@ let currentFIle;
 window.onload = async() => {
     let editor = editorInit();
     editor.load_text(test_text);
-    test = document.createElement("div");
-    document.getElementById("editor").appendChild(test);
-    test.style.whiteSpace = "pre-line";
-    test.innerText = editor.outputText();
     toolBarInit(document.getElementById("toolbar"));
     document.addEventListener("keydown", function(event){
         if (event.key === 'ArrowDown') {
