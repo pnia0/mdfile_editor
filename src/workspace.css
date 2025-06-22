@@ -31,15 +31,19 @@ html, body{
     border-bottom: 1.5px gray solid;
 }
 #editor{
+    min-width: 100%;
+    min-height: 100%;
     width: max-content;
     height: max-content;
     display: flex;
     flex-direction: column;
 }
 #headView{
+    min-width: 100%;
+    width: max-content;
+    height: max-content;
     margin-left: var(--line-number-offset);
     padding-left: var(--text-area-offset);
-    flex-grow: 1;
 }
 #cursorInput{
     field-sizing: content;
@@ -47,7 +51,7 @@ html, body{
     flex-grow: 1;
     resize: none;
     padding: 0px;
-    padding-top: 1%;
+    padding-top: 5px;
     padding-left: calc(var(--text-area-offset)/2);
     border: none;
     border-radius: 5px 0px 0px 5px;
@@ -78,14 +82,24 @@ html, body{
     background-color: if(style(--focus: true): var(--focus-collar));
 }
 #bottomView{
+    min-width: 100%;
+    width: max-content;
+    height: max-content;
     margin-left: var(--line-number-offset);
     padding-left: var(--text-area-offset);
-    flex-grow: 1;
-    overflow: auto;
 }
 .headButton{
     margin-left: 3px;
     margin-right: 3px;
     background-color: white;
-    border: 1.5px gray solid;
+    border: 1.5px #777 solid;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px #777;
+}
+.headButton:hover{
+    background-color: #ddd;
+}
+.headButton:active{
+    box-shadow: none;
+    background-color: #aaa;
 }
