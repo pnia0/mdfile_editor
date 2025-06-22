@@ -2,7 +2,7 @@
 //This project is licensed under the MIT License.
 //See the LICENSE file or https://opensource.org/licenses/mit-license.php for details.
 
-const test_text = '\n# MDfile_editor\n---\nこのプログラムはmdファイルをプレビューしながら編集できるエディターです。\nまずは灰色のカーソル行をタップしてみましょう。\nカーソルを上下させるとカーソル行だけがプレーンテキストで表示されているとわかります。\n## features\n- 編集行はプレーンテキスト、それ以外はmdの***装飾***が適用されます。\n- ローカルファイルの編集に対応しています。\n- デザインにも気を使っています。\n## 使用ライブラリ\nMDファイルをHTMLに変換するインタープリタ"Marked.js"を利用しています。感謝。\n## 使用上の注意\n- 注意はしていますが、バグの可能性がゼロではありません。編集するデータは必要に応じてバックアップしておいてください。\n- 保存していない状態でOpen/NewFileすると編集データが飛びます。警告は未実装です。\n- 作者はこのプログラムの使用によって生じたいかなる損害も補償しません。あしからず。\n## 今後実装したい機能\n- グーグルドライブ上のファイルの編集\n- vim準拠の編集機能\n- 画像の読み込み※画像として認識はされますが、表示はされません。\n## .P.S\nMITライセンスで公開してみたので、自由に使用することができます。\nContributorを歓迎します。設計思想に共感してくださった方はぜひ。';
+const test_text = '\n# MDfile_editor\n---\nこのプログラムはmdファイルをプレビューしながら編集できるエディターです。\nまずは灰色のカーソル行をタップしてみましょう。\nカーソルを上下させるとカーソル行だけがプレーンテキストで表示されているとわかります。\n## features\n- 編集行はプレーンテキスト、それ以外はmdの***装飾***が適用されます。\n- ローカルファイルの編集に対応しています。\n- デザインにも気を使っています。\n## 使用ライブラリ\nMDファイルをHTMLに変換するインタープリタ"Marked.js"を利用しています。感謝。\n## 使用上の注意\n- 注意はしていますが、バグの可能性がゼロではありません。編集するデータは必要に応じてバックアップしておいてください。\n- 保存していない状態でOpen/NewFileすると編集データが飛びます。警告は未実装です。\n- 作者はこのプログラムの使用によって生じたいかなる損害も補償しません。あしからず。\n## 今後実装したい機能\n- グーグルドライブ上のファイルの編集\n- vim準拠の編集機能\n- 画像の読み込み※画像として認識はされますが、表示はされません。\n## .P.S\nMITライセンスで公開してみたので、自由に使用することができます。\nContributorを歓迎します。設計思想に共感してくださった方はぜひ。\n';
 const LINE_NUMBER_OFFSET = "60px";
 const TEXT_AREA_OFFSET = "0.5em";
 
@@ -72,6 +72,9 @@ class Buffer {
         return {text: this.#centerBuffer, start: this.#cursor, end: this.#cursor, lineNumber: this.#lineNumber};
     }
     outputView(){
+        if(this.#bottomBuffer == "" && this.#isCenterenter) {
+            return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: "\n"};
+        }
         return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: this.#bottomBuffer};
     }
     outputText(cursorCenter){
@@ -88,6 +91,7 @@ class Buffer {
                 return count;
             }
         }
+        return length - 1;
     }
     picLastLine(text){
         let count = text.length;
@@ -114,7 +118,7 @@ class Buffer {
         return "" != this.#headBuffer;
     }
     isDown(){
-        return "" != this.#bottomBuffer;
+        return "" != this.#bottomBuffer || this.#isCenterenter;
     }
     trimEnter(text){
         let count = 0;
@@ -149,11 +153,13 @@ class Buffer {
                 this.#centerBuffer = "";
             }
         }
-        if ( this.#centerBuffer.length < cursorInput.start) {
+        //カーソル位置調整
+        if (this.#centerBuffer.length < cursorInput.start) {
             this.#cursor = this.#centerBuffer.length - 1;
         } else {
             this.#cursor = cursorInput.start;
         }
+
         if (firstLineBottom == this.#bottomBuffer.length){
             this.#bottomBuffer = "";
         } else {
