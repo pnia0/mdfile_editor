@@ -57,11 +57,15 @@ class Buffer {
     #isCenterenter = false;
     #centerBuffer = "";
     #bottomBuffer = "";
-    init(text){
+    init(inText){
+        let text = this.trimEnter(inText);
         let firstLineBottom = this.picFirstLine(text);
+        this.#headBuffer = "";
         this.#centerBuffer = text.substring(0, firstLineBottom);
         this.#isCenterenter = true;
         this.#bottomBuffer = text.substring(firstLineBottom + 1);
+        this.#lineNumber = 1;
+        this.#cursor = 0;
         return this.outputView();
     }
     outputCursor(){
@@ -108,6 +112,22 @@ class Buffer {
     }
     isDown(){
         return "" != this.#bottomBuffer;
+    }
+    trimEnter(text){
+        let count = 0;
+        let length = text.length;
+        let output = "";
+        while (count <= length) {
+            if (text.substring(count, count + 1) == "\r"){
+                output += "\n";
+                count++;
+                if (text.substring(count, count + 1) == "\n") {count++;}
+            } else {
+                output += text.substring(count, count + 1);
+                count++;
+            }
+        }
+        return output;
     }
     arrowDown(cursorInput){
         if (!this.isDown()) {return};
@@ -313,24 +333,30 @@ function editorInit(){
     return new Editor(document.getElementById("editor"));
 }
 
-function toolBarInit(area){
+function toolBarInit(editor, area){
     let buttonOpen = document.createElement("input");
     buttonOpen.type = "button";
     buttonOpen.value = "Open";
     buttonOpen.classList = "headButton";
-    buttonOpen.addEventListener("click", openFile);
+    buttonOpen.addEventListener("click", function(){
+        openFile(editor)
+    });
 
     let buttonSave = document.createElement("input");
     buttonSave.type = "button";
     buttonSave.value = "Save";
     buttonSave.classList = "headButton";
-    buttonSave.addEventListener("click", saveFile);
+    buttonSave.addEventListener("click", function(){
+        saveFile(editor);
+    });
 
     let buttonNew = document.createElement("input");
     buttonNew.type = "button";
     buttonNew.value = "new";
     buttonNew.classList = "headButton";
-    buttonNew.addEventListener("click", newFile);
+    buttonNew.addEventListener("click", function(){
+        newFile(editor)
+    });
 
     area.appendChild(buttonOpen);
     area.appendChild(buttonSave);
@@ -373,7 +399,7 @@ let currentFIle;
 window.onload = async() => {
     let editor = editorInit();
     editor.load_text(test_text);
-    toolBarInit(document.getElementById("toolbar"));
+    toolBarInit(editor, document.getElementById("toolbar"));
     document.addEventListener("keydown", function(event){
         if (event.key === 'ArrowDown') {
             event.preventDefault();
@@ -410,7 +436,7 @@ window.onload = async() => {
         if (event.ctrlKey && event.key == 'o') {
             event.preventDefault();
             if(!state_o){
-                state_0 = true;
+                state_o = true;
                 openFile(editor);
             }
         }
