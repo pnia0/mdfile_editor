@@ -339,7 +339,7 @@ function toolBarInit(editor, area){
     buttonOpen.value = "Open";
     buttonOpen.classList = "headButton";
     buttonOpen.addEventListener("click", function(){
-        openFile(editor)
+        openFile(editor);
     });
 
     let buttonSave = document.createElement("input");
@@ -355,7 +355,7 @@ function toolBarInit(editor, area){
     buttonNew.value = "new";
     buttonNew.classList = "headButton";
     buttonNew.addEventListener("click", function(){
-        newFile(editor)
+        newFile(editor);
     });
 
     area.appendChild(buttonOpen);
@@ -365,7 +365,7 @@ function toolBarInit(editor, area){
 
 async function saveFile(editor){
     if (!editor.targetFile){
-        [editor.targetFile] = await window.showOpenFilePicker({
+        editor.targetFile = await window.showSaveFilePicker({
             types: [
                 {
                     description: '保存先ファイル',
@@ -391,7 +391,11 @@ async function openFile(editor){
     }
 }
 
-function newFile(){}
+function newFile(editor){
+    editor.targetFile = null;
+    editor.load_text("");
+}
+
 let test;
 let state_s = false;
 let state_o = false;
@@ -426,7 +430,6 @@ window.onload = async() => {
         }
         */
         if (event.ctrlKey && event.key === 's') {
-            console.log(state_s);
             event.preventDefault();
             if (!state_s){
                 state_s = true;
