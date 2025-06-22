@@ -71,6 +71,9 @@ class Buffer {
     outputCursor(){
         return {text: this.#centerBuffer, start: this.#cursor, end: this.#cursor, lineNumber: this.#lineNumber};
     }
+    outputView(){
+        return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: this.#bottomBuffer};
+    }
     outputText(cursorCenter){
         if (this.#isCenterenter) {
             return this.#headBuffer + cursorCenter.text + "\n" + this.#bottomBuffer;
@@ -230,9 +233,6 @@ class Buffer {
             this.#bottomBuffer = this.#bottomBuffer.substring(firstLineBottom + 1);
         }
         return this.outputView();
-    }
-    outputView(){
-        return {headBuffer: this.#headBuffer, centerBuffer: this.outputCursor(), bottomBuffer: this.#bottomBuffer};
     }
 }
 
