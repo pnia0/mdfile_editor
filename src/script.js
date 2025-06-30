@@ -402,6 +402,30 @@ function newFile(editor){
     editor.load_text("");
 }
 
+function phoneUIinit(editor) {
+    let phoneUI = document.createElement("div");
+    phoneUI.id = "phoneUI";
+
+    let workspace = document.getElementById("workspace")
+    workspace.appendChild(phoneUI);
+
+    let upButton = document.createElement("input");
+    upButton.classList.add("phoneUI-button");
+    upButton.type = "button";
+    upButton.addEventListener("click", function(){
+        editor.arrowUp();
+    });
+    phoneUI.appendChild(upButton);
+
+    let downButton = document.createElement("input");
+    downButton.classList.add("phoneUI-button");
+    downButton.type = "button";
+    downButton.addEventListener("click", function(){
+        editor.arrowDown();
+    });
+    phoneUI.appendChild(downButton);
+}
+
 let test;
 let state_s = false;
 let state_o = false;
@@ -410,6 +434,8 @@ window.onload = async() => {
     let editor = editorInit();
     editor.load_text(test_text);
     toolBarInit(editor, document.getElementById("toolbar"));
+    phoneUIinit(editor);
+
     document.addEventListener("keydown", function(event){
         if (event.key === 'ArrowDown') {
             event.preventDefault();

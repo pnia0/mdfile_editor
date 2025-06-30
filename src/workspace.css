@@ -38,6 +38,44 @@ html, body{
     display: flex;
     flex-direction: column;
 }
+#phoneUI{
+    position: absolute;
+    left: 0%;
+    top: 5%;
+    width: 1.8em;
+    height: 3.5em;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 2px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: #ddd;
+    border: 1.5px gray solid;
+    border-left: none;
+    border-radius: 0px 0.75em 0.75em 0px;
+}
+
+.phoneUI-button{
+    height: 1.5em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+
+    background-color: white;
+    border: 1.5px #777 solid;
+    box-shadow: 1px 1px 1px #777;
+}
+.phoneUI-button:hover{
+    background-color: #ddd;
+}
+.phoneUI-button:active{
+    box-shadow: none;
+    background-color: #aaa;
+}
+
 #headView{
     min-width: 100%;
     width: max-content;
