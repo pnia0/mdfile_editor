@@ -29,6 +29,7 @@ html, body{
     width: 100%;
     height: 2rem;
     border-bottom: 1.5px gray solid;
+    align-items: center;
 }
 #editor{
     min-width: 100%;
@@ -80,8 +81,8 @@ html, body{
     min-width: 100%;
     width: max-content;
     height: max-content;
-    margin-left: var(--line-number-offset);
-    padding-left: var(--text-area-offset);
+    box-sizing: border-box;
+    padding-left: calc(var(--text-area-offset) + var(--line-number-offset));
 }
 #cursorInput{
     field-sizing: content;
@@ -123,8 +124,8 @@ html, body{
     min-width: 100%;
     width: max-content;
     height: max-content;
-    margin-left: var(--line-number-offset);
-    padding-left: var(--text-area-offset);
+    box-sizing: border-box;
+    padding-left: calc(var(--text-area-offset) + var(--line-number-offset));
 }
 .headButton{
     margin-left: 3px;
